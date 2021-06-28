@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
 import axios from 'axios';
 import { API_URL, API_KEY } from './config.js';
 
 function App() {
   const [typeAPosts, setTypeAPosts] = useState();
+  const [page, setPage] = useState();
+  const [ref, inView] = useInView();
 
   useEffect(() => {
     if (!typeAPosts) {
@@ -23,7 +26,28 @@ function App() {
 
   let typeALists = '';
   if (!!typeAPosts) {
-    typeALists = typeAPosts.map((post) => <li>{post.title}</li>);
+    typeALists = typeAPosts.map((post, index) => (
+      <div
+        class="max-w-4xl px-10 my-4 py-6 bg-white rounded-lg shadow-md"
+        key={index}
+      >
+        <div class="flex justify-between items-center"></div>
+        <div class="mt-2">
+          <a
+            class="text-2xl text-gray-700 font-bold hover:text-gray-600"
+            href="#"
+          >
+            {post.title}
+          </a>
+          <p class="mt-2 text-gray-600 line-clamp-3">{post.content}</p>
+        </div>
+        <div class="flex justify-between items-center mt-4">
+          <a class="text-blue-600 hover:underline" href="#">
+            Read more
+          </a>
+        </div>
+      </div>
+    ));
   }
 
   return <div>{typeALists}</div>;
