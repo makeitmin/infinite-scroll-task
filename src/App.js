@@ -16,7 +16,7 @@ function App() {
   const [ref, inView, entry] = useInView();
   const page = useRef(0);
   const [keyword, setKeyword] = useState(false);
-  
+
   useEffect(() => {
     if (inView) {
       setIsLoading(true);
@@ -44,12 +44,9 @@ function App() {
       axios
         .get(`${API_URL}/${API_KEY}/a-posts?search=${e.target.value}`)
         .then(function (response) {
-          console.log('포스트 호출 성공');
-          console.log(response.data);
           dispatch(searchAPost(response.data));
         })
         .catch(function (error) {
-          console.log('포스트 호출 실패');
           console.log(error);
         });
     } else {
@@ -59,15 +56,15 @@ function App() {
 
   return (
     <div>
-      <div class="pt-2 relative mx-auto text-gray-600">
+      <div className="mt-5 pt-2 relative text-gray-600 text-center">
         <button
-          class="absolute top-0 mt-5 mr-4"
+          className="absolute top-0 mt-5 mr-4 ml-3"
           onClick={() => {
             document.getElementById('search').focus();
           }}
         >
           <svg
-            class="text-gray-600 h-4 w-4 fill-current"
+            className="text-gray-600 h-4 w-4 fill-current"
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"
             version="1.1"
@@ -84,7 +81,7 @@ function App() {
           </svg>
         </button>
         <input
-          class="border-2 border-gray-300 bg-white h-10 px-5 pr-16 rounded-lg text-sm focus:outline-none"
+          className="pl-10 border-2 border-gray-300 bg-white h-10 px-5 pr-16 text-sm focus:outline-none"
           type="search"
           id="search"
           name="search"
@@ -97,19 +94,18 @@ function App() {
           <div>
             {posts.map((post) => (
               <div key={post.id}>
-                <div className="max-w-4xl px-10 my-4 py-6 bg-white rounded-lg shadow-md">
+                <div className="max-w-4xl px-10 my-4 py-6 hover:bg-gray-100">
                   <div className="flex justify-between items-center"></div>
                   <div className="mt-2">
-                    <a className="text-2xl text-gray-700 font-bold hover:text-gray-600">
-                      {post.id}
+                    <a className="text-base text-blue-700 font-bold">
+                      {post.id + '. '}
+                    </a>
+                    <a className="text-base text-black-700 font-bold">
                       {post.title}
                     </a>
                     <p className="mt-2 text-gray-600 line-clamp-3">
                       {post.content}
                     </p>
-                  </div>
-                  <div className="flex justify-between items-center mt-4">
-                    <a className="text-blue-600 hover:underline">Read more</a>
                   </div>
                 </div>
               </div>
@@ -122,19 +118,18 @@ function App() {
           <div>
             {searchResults.map((result) => (
               <div key={result.id}>
-                <div className="max-w-4xl px-10 my-4 py-6 bg-white rounded-lg shadow-md">
+                <div className="max-w-4xl px-10 my-4 py-6 hover:bg-gray-100">
                   <div className="flex justify-between items-center"></div>
                   <div className="mt-2">
-                    <a className="text-2xl text-gray-700 font-bold hover:text-gray-600">
-                      {result.id}
+                    <a className="text-base text-blue-700 font-bold">
+                      {result.id + '. '}
+                    </a>
+                    <a className="text-base text-black-700 font-bold">
                       {result.title}
                     </a>
                     <p className="mt-2 text-gray-600 line-clamp-3">
                       {result.content}
                     </p>
-                  </div>
-                  <div className="flex justify-between items-center mt-4">
-                    <a className="text-blue-600 hover:underline">Read more</a>
                   </div>
                 </div>
               </div>
