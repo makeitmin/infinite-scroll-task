@@ -4,3 +4,10 @@ export const setAPost = (item) => {
     payload: item
   };
 };
+
+export const searchAPost = (item) => {
+  return {
+    type: 'SEARCH_A_POST',
+    payload: item
+  };
+};
