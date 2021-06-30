@@ -13,32 +13,24 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [ref, inView, entry] = useInView();
   const page = useRef(0);
-  console.log('맨처음 :' + page.current);
 
   useEffect(() => {
     if (inView) {
       setIsLoading(true);
       if (page.current === 0 && posts.length === 0) {
-        console.log('아무것도 없을때:' + page.current);
         page.current = 0;
-        console.log('0으로 초기화:' + page.current);
       } else if (page.current >= 0) {
-        console.log('0보다 같거나 클때:' + page.current);
         page.current += 1;
-        console.log('기존 +1: ' + page.current);
       }
-      console.log('useEffect 실행후 : ' + page.current);
       axios
         .get(`${API_URL}/${API_KEY}/a-posts?page=${page.current}`)
         .then(function (response) {
-          console.log('포스트 호출 성공');
-          console.log(response.data);
           dispatch(setAPost(response.data));
           setIsLoading(false);
         })
         .catch(function (error) {
-          console.log('포스트 호출 실패');
           console.log(error);
+          setIsLoading(false);
         });
     }
   }, [inView]);
