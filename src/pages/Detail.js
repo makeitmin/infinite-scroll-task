@@ -28,8 +28,20 @@ function Detail() {
 
   return (
     <div>
-      {postTitle}
-      {postContent}
+      <div className="border border-gray-300 max-w-7xl px-10 my-4 py-6 hover:bg-gray-100 mb-5">
+        <div className="mt-5 mb-5">
+          <div className="text-center mb-10">
+            <a className="text-2xl text-black-700 font-bold">{postTitle}</a>
+          </div>
+          <p className="text-base mt-2 text-gray-600">{postContent}</p>
+        </div>
+      </div>
+      <a
+        href="/"
+        class="bg-blue-500 rounded-lg text-white text-center px-6 py-3 transition duration-300 ease-in-out hover:bg-blue-600 mr-6"
+      >
+        뒤로가기
+      </a>
     </div>
   );
 }
