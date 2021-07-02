@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { setAPost } from '../store/actions';
+import { setBPost } from '../store/actions';
 import { searchAPost } from '../store/actions';
 import { useInView } from 'react-intersection-observer';
 import { API_URL, API_KEY } from '../config.js';
@@ -12,38 +13,68 @@ function Board() {
   const history = useHistory();
   const dispatch = useDispatch();
   const posts = useSelector((store) => store.postReducer);
+  const [aPosts, setAPosts] = useState([]);
+  const [bPosts, setBPosts] = useState([]);
   const searchResults = useSelector((store) => store.searchReducer);
-  const [isLoading, setIsLoading] = useState(false);
   const [ref, inView, entry] = useInView();
-  const page = useRef(0);
+  const aPage = useRef(0);
+  const bPage = useRef(0);
+  const [isLoading, setIsLoading] = useState(false);
   const [keyword, setKeyword] = useState(false);
+  const [tab, setTab] = useState('a');
+
+  function getPosts(page) {
+    axios
+      .get(`${API_URL}/${API_KEY}/${tab}-posts?page=${page}`)
+      .then(function (response) {
+        if (tab === 'a') {
+          dispatch(setAPost(response.data));
+        } else if (tab === 'b') {
+          dispatch(setBPost(response.data));
+        }
+        setIsLoading(false);
+      })
+      .catch(function (error) {
+        console.log(error);
+        setIsLoading(false);
+      });
+  }
+
+  useEffect(() => {
+    if (posts.a.length !== 0) {
+      setAPosts(posts.a);
+    }
+    if (posts.b.length !== 0) {
+      setBPosts(posts.b);
+    }
+  }, [posts.a, posts.b]);
 
   useEffect(() => {
     if (inView) {
       setIsLoading(true);
-      if (page.current === 0 && posts.length === 0) {
-        page.current = 0;
-      } else if (page.current >= 0) {
-        page.current += 1;
+      if (tab === 'a') {
+        if (aPage.current === 0 && aPosts.length === 0) {
+          aPage.current = 0;
+        } else if (aPage.current >= 0) {
+          aPage.current += 1;
+        }
+        getPosts(aPage.current);
+      } else if (tab === 'b') {
+        if (bPage.current === 0 && bPosts.length === 0) {
+          bPage.current = 0;
+        } else if (bPage.current >= 0) {
+          bPage.current += 1;
+        }
+        getPosts(bPage.current);
       }
-      axios
-        .get(`${API_URL}/${API_KEY}/a-posts?page=${page.current}`)
-        .then(function (response) {
-          dispatch(setAPost(response.data));
-          setIsLoading(false);
-        })
-        .catch(function (error) {
-          console.log(error);
-          setIsLoading(false);
-        });
     }
-  }, [inView]);
+  }, [inView, tab]);
 
   function handleChange(e) {
     if (!!e.target.value) {
       setKeyword(true);
       axios
-        .get(`${API_URL}/${API_KEY}/a-posts?search=${e.target.value}`)
+        .get(`${API_URL}/${API_KEY}/${tab}-posts?search=${e.target.value}`)
         .then(function (response) {
           dispatch(searchAPost(response.data));
         })
@@ -52,6 +83,53 @@ function Board() {
         });
     } else {
       setKeyword(false);
+    }
+  }
+
+  let postList = '';
+  if (tab === 'a') {
+    if (aPosts.length !== 0 && keyword === false) {
+      postList = aPosts.map((post) => (
+        <div key={post.id}>
+          <div
+            className="max-w-4xl px-10 my-4 py-6 hover:bg-gray-100"
+            onClick={() => {
+              history.push(`/${post.type}?id=${post.id}`);
+            }}
+          >
+            <div className="flex justify-between items-center"></div>
+            <div className="mt-2">
+              <a className="text-base text-blue-700 font-bold">
+                {post.id + '. '}
+              </a>
+              <a className="text-base text-black-700 font-bold">{post.title}</a>
+              <p className="mt-2 text-gray-600 line-clamp-3">{post.content}</p>
+            </div>
+          </div>
+        </div>
+      ));
+    }
+  } else if (tab === 'b') {
+    if (bPosts.length !== 0 && keyword === false) {
+      postList = bPosts.map((post) => (
+        <div key={post.id}>
+          <div
+            className="max-w-4xl px-10 my-4 py-6 hover:bg-gray-100"
+            onClick={() => {
+              history.push(`/${post.type}?id=${post.id}`);
+            }}
+          >
+            <div className="flex justify-between items-center"></div>
+            <div className="mt-2">
+              <a className="text-base text-blue-700 font-bold">
+                {post.id + '. '}
+              </a>
+              <a className="text-base text-black-700 font-bold">{post.title}</a>
+              <p className="mt-2 text-gray-600 line-clamp-3">{post.content}</p>
+            </div>
+          </div>
+        </div>
+      ));
     }
   }
 
@@ -90,36 +168,30 @@ function Board() {
           onChange={handleChange}
         />
       </div>
+      <div className="bg-white">
+        <nav className="flex flex-col sm:flex-row">
+          <button
+            className="py-4 px-6 block hover:text-blue-500 focus:outline-none focus:text-blue-500 font-bold"
+            onClick={(e) => {
+              e.preventDefault();
+              setTab('a');
+            }}
+          >
+            A Posts
+          </button>
+          <button
+            className="py-4 px-6 block hover:text-blue-500 focus:outline-none focus:text-blue-500 font-bold"
+            onClick={(e) => {
+              e.preventDefault();
+              setTab('b');
+            }}
+          >
+            B Posts
+          </button>
+        </nav>
+      </div>
+      {postList}
       <div>
-        {posts.length !== 0 && keyword === false ? (
-          <div>
-            {posts.map((post) => (
-              <div key={post.id}>
-                <div
-                  className="max-w-4xl px-10 my-4 py-6 hover:bg-gray-100"
-                  onClick={() => {
-                    history.push(`/${post.type}?id=${post.id}`);
-                  }}
-                >
-                  <div className="flex justify-between items-center"></div>
-                  <div className="mt-2">
-                    <a className="text-base text-blue-700 font-bold">
-                      {post.id + '. '}
-                    </a>
-                    <a className="text-base text-black-700 font-bold">
-                      {post.title}
-                    </a>
-                    <p className="mt-2 text-gray-600 line-clamp-3">
-                      {post.content}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          ''
-        )}
         {searchResults.length !== 0 && keyword === true ? (
           <div>
             {searchResults.map((result) => (
