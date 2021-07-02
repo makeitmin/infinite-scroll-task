@@ -169,13 +169,14 @@ function Board() {
         />
       </div>
       <div className="bg-white">
-        <nav className="flex flex-col sm:flex-row">
+        <nav className="flex flex-col sm:flex-row border-b-2 border-gray-300">
           <button
             className="py-4 px-6 block hover:text-blue-500 focus:outline-none focus:text-blue-500 font-bold"
             onClick={(e) => {
               e.preventDefault();
               setTab('a');
             }}
+            autoFocus={true}
           >
             A Posts
           </button>
